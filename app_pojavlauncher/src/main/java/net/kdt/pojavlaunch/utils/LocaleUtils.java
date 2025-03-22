@@ -2,7 +2,7 @@ package net.kdt.pojavlaunch.utils;
 
 
 import static net.kdt.pojavlaunch.prefs.LauncherPreferences.DEFAULT_PREF;
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_FORCE_ENGLISH;
+import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_SELECTED_LANGUAGE;
 
 import android.content.*;
 import android.content.res.*;
@@ -23,18 +23,19 @@ public class LocaleUtils extends ContextWrapper {
             DEFAULT_PREF = PreferenceManager.getDefaultSharedPreferences(context);
             // Too early to initialize all prefs here, as this is called by PojavApplication
             // before storage checks are done and before the storage paths are initialized.
-            // So only initialize PREF_FORCE_ENGLISH for the check below.
-            PREF_FORCE_ENGLISH = DEFAULT_PREF.getBoolean("force_english", false);
+            // So only initialize PREF_SELECTED_LANGUAGE for the check below.
+            PREF_SELECTED_LANGUAGE = DEFAULT_PREF.getString("selected_language", "default");
         }
 
-        if(PREF_FORCE_ENGLISH){
+        if(!PREF_SELECTED_LANGUAGE.equals("default")) {
             Resources resources = context.getResources();
             Configuration configuration = resources.getConfiguration();
+            Locale locale = new Locale(PREF_SELECTED_LANGUAGE);
 
-            configuration.setLocale(Locale.ENGLISH);
-            Locale.setDefault(Locale.ENGLISH);
+            configuration.setLocale(locale);
+            Locale.setDefault(locale);
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-                LocaleList localeList = new LocaleList(Locale.ENGLISH);
+                LocaleList localeList = new LocaleList(locale);
                 LocaleList.setDefault(localeList);
                 configuration.setLocales(localeList);
             }

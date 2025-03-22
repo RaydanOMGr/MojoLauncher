@@ -77,11 +77,13 @@ import org.apache.commons.io.IOUtils;
 import org.lwjgl.glfw.CallbackBridge;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -92,6 +94,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -102,7 +105,7 @@ import git.artdeell.mojo.R;
 
 @SuppressWarnings("IOStreamConstructor")
 public final class Tools {
-    public  static final float BYTE_TO_MB = 1024 * 1024;
+    public static final float BYTE_TO_MB = 1024 * 1024;
     public static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
     public static String APP_NAME = "PojavLauncher";
 
@@ -136,6 +139,7 @@ public final class Tools {
     public static String CTRLMAP_PATH;
     public static String CTRLDEF_FILE;
     private static RenderersList sCompatibleRenderers;
+    private static List<String> languages;
 
 
     private static File getPojavStorageRoot(Context ctx) {
@@ -144,6 +148,34 @@ public final class Tools {
         }else{
             return new File(Environment.getExternalStorageDirectory(),"games/PojavLauncher");
         }
+    }
+
+    public static List<String> getLanguages(Context context) {
+        if(languages == null) {
+            List<String> strings = new ArrayList<>();
+            try(InputStream inputStream = context.getResources().openRawResource(R.raw.languagelist);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    strings.add(line);
+                }
+            } catch (IOException e) {
+                Log.e("Language List", "Failed to read the language list file!", e);
+                return Collections.emptyList();
+            }
+            languages = strings;
+        }
+        return new ArrayList<>(languages);
+    }
+
+    public static Locale localeFrom(String code) {
+        String[] splitCode = code.split("-", 2);
+        if(splitCode.length != 2) return new Locale(code);
+        return new Locale(splitCode[0]);
+    }
+
+    public static String getLanguageName(Locale locale) {
+        return locale.getDisplayName(locale);
     }
 
     /**

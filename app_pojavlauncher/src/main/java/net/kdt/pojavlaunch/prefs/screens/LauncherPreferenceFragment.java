@@ -8,12 +8,18 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import net.kdt.pojavlaunch.LauncherActivity;
 import git.artdeell.mojo.R;
+
+import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.prefs.LauncherPreferences;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Preference for the main screen, any sub-screen should inherit this class for consistent behavior,
@@ -31,6 +37,7 @@ public class LauncherPreferenceFragment extends PreferenceFragmentCompat impleme
     public void onCreatePreferences(Bundle b, String str) {
         addPreferencesFromResource(R.xml.pref_main);
         setupNotificationRequestPreference();
+        setupLanguageSelectorPreference();
     }
 
     private void setupNotificationRequestPreference() {
@@ -45,6 +52,32 @@ public class LauncherPreferenceFragment extends PreferenceFragmentCompat impleme
             });
         }else{
             mRequestNotificationPermissionPreference.setVisible(false);
+        }
+    }
+
+    private void setupLanguageSelectorPreference() {
+        ListPreference languagesListPref = requirePreference("change_language", ListPreference.class);
+
+        List<String> availableLanguages = new ArrayList<>();
+        availableLanguages.add("default");
+        availableLanguages.addAll(Tools.getLanguages(getContext()));
+
+        List<String> languageNames = new ArrayList<>();
+        for (String code : availableLanguages) {
+            if(code.equals("default")) languageNames.add("System default");
+            else languageNames.add(Tools.getLanguageName(Tools.localeFrom(code)));
+        }
+        if (languagesListPref != null) {
+            languagesListPref.setEntries(languageNames.toArray(new String[0]));
+            languagesListPref.setEntryValues(availableLanguages.toArray(new String[0]));
+            languagesListPref.setDefaultValue(languageNames.get(0));
+
+            languagesListPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                LauncherPreferences.DEFAULT_PREF.edit()
+                        .putString("selected_language", (String) newValue)
+                        .apply();
+                return true;
+            });
         }
     }
 

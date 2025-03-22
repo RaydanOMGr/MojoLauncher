@@ -260,6 +260,35 @@ android.applicationVariants.configureEach { variant ->
     registrar.onlineJarDependency String.format(cacioBuildRepository, "caciocavallo17"), "Caciocavallo17", "components/caciocavallo17"
 }
 
+def languageIntermediates = new File(project.projectDir, "build/intermediates/language_list/")
+project.android.sourceSets.main.res.srcDirs += languageIntermediates.absolutePath
+
+tasks.register('generateLanguageList') {
+    def outputDir = new File(languageIntermediates, "raw")
+    outputDir.mkdirs()
+
+    def languageListFile = new File(outputDir, "languagelist.txt")
+    def languages = new StringBuilder()
+
+    def fileList = file("src/main/res/").listFiles();
+    if (fileList != null) {
+        for (def subdirectory in fileList) {
+            if (!subdirectory.isDirectory()) continue;
+            if (!new File(subdirectory, "strings.xml").exists()) continue;
+            if (!subdirectory.name.startsWith("values-")) continue;
+
+            languages.append(subdirectory.name.substring("values-".length()))
+            languages.append('\n')
+        }
+    }
+
+    languageListFile.text = languages.toString()
+
+    inputs.dir 'src/main/res/'
+    outputs.file languageListFile
+}
+tasks.preBuild.dependsOn generateLanguageList
+
 afterEvaluate {
     // Explicit dependencies for which the apk relies on
     tasks.mergeDebugAssets.dependsOn(":forge_installer:jar", ":arc_dns_injector:jar", ":jre_lwjgl3glfw:jar")
