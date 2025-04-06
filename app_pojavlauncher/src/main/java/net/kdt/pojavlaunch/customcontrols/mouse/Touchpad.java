@@ -6,18 +6,23 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.ArrayMap;
 import android.util.AttributeSet;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.res.ResourcesCompat;
 
+import net.kdt.pojavlaunch.customcontrols.mouse.cursor.Cursor;
 import net.kdt.pojavlaunch.GrabListener;
-import git.artdeell.mojo.R;
+
+import net.kdt.pojavlaunch.customcontrols.mouse.cursor.CursorUpdateListener;
+import net.kdt.pojavlaunch.customcontrols.mouse.cursor.StandardCursor;
 import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 
 import org.lwjgl.glfw.CallbackBridge;
+
+import java.util.Map;
 
 /**
  * Class dealing with the virtual mouse
@@ -25,6 +30,8 @@ import org.lwjgl.glfw.CallbackBridge;
 public class Touchpad extends View implements GrabListener, AbstractTouchpad {
     /* Whether the Touchpad should be displayed */
     private boolean mDisplayState;
+    private Cursor mCursor;
+    private Map<Long, Cursor> mCursorMap;
     /* Mouse pointer icon used by the touchpad */
     private Drawable mMousePointerDrawable;
     private float mMouseX, mMouseY;
@@ -78,21 +85,45 @@ public class Touchpad extends View implements GrabListener, AbstractTouchpad {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.translate(mMouseX, mMouseY);
+        float scale = LauncherPreferences.PREF_MOUSESCALE;
+        canvas.translate(
+                mMouseX - (mCursor.getXHotspot() * scale),
+                mMouseY - (mCursor.getYHotspot() * scale)
+        );
         mMousePointerDrawable.draw(canvas);
     }
 
     private void init(){
         // Setup mouse pointer
-        mMousePointerDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_mouse_pointer, getContext().getTheme());
-        // For some reason it's annotated as Nullable even though it doesn't seem to actually
-        // ever return null
-        assert mMousePointerDrawable != null;
-        mMousePointerDrawable.setBounds(
-                0, 0,
-                (int) (36 * LauncherPreferences.PREF_MOUSESCALE),
-                (int) (54 * LauncherPreferences.PREF_MOUSESCALE)
-        );
+        mCursorMap = new ArrayMap<>();
+        CursorUpdateListener onUpdate = ((cursor) -> post(() -> {
+            if(!mCursorMap.containsKey(cursor)) {
+                mCursorMap.put(cursor, CallbackBridge.getCursor(cursor));
+            }
+            mCursor = mCursorMap.get(cursor);
+            setupMousePointer();
+            invalidate();
+        }));
+        CursorUpdateListener onDestroy = ((cursor) -> {
+            if(!mCursorMap.containsKey(cursor)) return;
+            if(mCursorMap.get(cursor) == mCursor) mCursor = new StandardCursor();
+            mCursorMap.remove(cursor);
+        });
+        addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                CallbackBridge.addCursorUpdateListener(onUpdate);
+                CallbackBridge.addCursorDestroyListener(onDestroy);
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                CallbackBridge.removeCursorUpdateListener(onUpdate);
+                CallbackBridge.removeCursorDestroyListener(onDestroy);
+            }
+        });
+
+
         setFocusable(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setDefaultFocusHighlightEnabled(false);
@@ -101,6 +132,15 @@ public class Touchpad extends View implements GrabListener, AbstractTouchpad {
         // When the game is grabbing, we should not display the mouse
         disable();
         mDisplayState = false;
+    }
+
+    private void setupMousePointer() {
+        mMousePointerDrawable = mCursor.getDrawable(getContext());
+        mMousePointerDrawable.setBounds(
+                0, 0,
+                (int) (mCursor.getWidth() * LauncherPreferences.PREF_MOUSESCALE),
+                (int) (mCursor.getHeight() * LauncherPreferences.PREF_MOUSESCALE)
+        );
     }
 
     @Override

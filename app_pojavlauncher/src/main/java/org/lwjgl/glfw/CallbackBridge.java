@@ -1,6 +1,10 @@
 package org.lwjgl.glfw;
 
 import net.kdt.pojavlaunch.*;
+import net.kdt.pojavlaunch.customcontrols.mouse.cursor.ByteBufferCursor;
+import net.kdt.pojavlaunch.customcontrols.mouse.cursor.Cursor;
+import net.kdt.pojavlaunch.customcontrols.mouse.cursor.CursorUpdateListener;
+import net.kdt.pojavlaunch.customcontrols.mouse.cursor.StandardCursor;
 import net.kdt.pojavlaunch.customcontrols.gamepad.direct.DirectGamepadEnableHandler;
 
 import android.content.*;
@@ -24,11 +28,13 @@ public class CallbackBridge {
     private static final ArrayList<GrabListener> grabListeners = new ArrayList<>();
     // Use a weak reference here to avoid possibly statically referencing a Context.
     private static @Nullable WeakReference<DirectGamepadEnableHandler> sDirectGamepadEnableHandler;
-    
+    private static final ArrayList<CursorUpdateListener> cursorUpdateListeners = new ArrayList<>();
+    private static final ArrayList<CursorUpdateListener> cursorDestroyListeners = new ArrayList<>();
+
     public static final int CLIPBOARD_COPY = 2000;
     public static final int CLIPBOARD_PASTE = 2001;
     public static final int CLIPBOARD_OPEN = 2002;
-    
+
     public static volatile int windowWidth, windowHeight;
     public static volatile int physicalWidth, physicalHeight;
     public static float mouseX, mouseY;
@@ -107,6 +113,49 @@ public class CallbackBridge {
 
     public static void sendUpdateWindowSize(int w, int h) {
         nativeSendScreenSize(w, h);
+    }
+
+    public static Cursor getCursor(long pointer) {
+        if(pointer == 0) return new StandardCursor();
+        ByteBuffer buffer = nativeGetCursor(pointer);
+        if(buffer == null) return new StandardCursor();
+        buffer.order(ByteOrder.nativeOrder());
+        return new ByteBufferCursor(buffer);
+    }
+
+    public static void addCursorUpdateListener(CursorUpdateListener listener) {
+        listener.onUpdate(nativeGetCursorPointer());
+        cursorUpdateListeners.add(listener);
+    }
+
+    public static void removeCursorUpdateListener(CursorUpdateListener listener) {
+        cursorUpdateListeners.remove(listener);
+    }
+
+    // called from JNI
+    @Keep
+    private static void onCursorUpdate() {
+        long cursor = nativeGetCursorPointer();
+        for (CursorUpdateListener listener : cursorUpdateListeners) {
+            listener.onUpdate(cursor);
+        }
+    }
+
+    public static void addCursorDestroyListener(CursorUpdateListener listener) {
+        cursorDestroyListeners.add(listener);
+    }
+
+    public static void removeCursorDestroyListener(CursorUpdateListener listener) {
+        cursorDestroyListeners.remove(listener);
+    }
+
+    // called from JNI
+    @Keep
+    private static void onCursorDestroy(long destroyedCursor) {
+        Log.d("Cursor", "Destroying 0x" + Long.toHexString(destroyedCursor).toUpperCase());
+        for (CursorUpdateListener listener : cursorDestroyListeners) {
+            listener.onUpdate(destroyedCursor);
+        }
     }
 
     public static boolean isGrabbing() {
@@ -237,6 +286,10 @@ public class CallbackBridge {
     @Keep @CriticalNative private static native void nativeSendMouseButton(int button, int action, int mods);
     @Keep @CriticalNative private static native void nativeSendScroll(double xoffset, double yoffset);
     @Keep @CriticalNative private static native void nativeSendScreenSize(int width, int height);
+    public static native void nativeDeallocateDirectByteBuffer(ByteBuffer buf);
+    @Nullable
+    private static native ByteBuffer nativeGetCursor(long pointer);
+    public static native long nativeGetCursorPointer();
     public static native void nativeSetWindowAttrib(int attrib, int value);
     private static native ByteBuffer nativeCreateGamepadButtonBuffer();
     private static native ByteBuffer nativeCreateGamepadAxisBuffer();

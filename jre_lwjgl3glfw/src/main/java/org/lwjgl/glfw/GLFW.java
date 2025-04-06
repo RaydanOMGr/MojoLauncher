@@ -21,6 +21,7 @@ import static org.lwjgl.system.Checks.*;
 import static org.lwjgl.system.JNI.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
+
 import java.util.*;
 
 public class GLFW
@@ -1184,14 +1185,36 @@ public class GLFW
         CallbackBridge.sendGrabbing(mGLFWIsGrabbing, (int) xpos, (int) ypos);
     }*/
 
+    // we want to mimic behaviour of real GLFW so mods that mixin into it for the sake of doing cursor stuff don't die as easily
+    // this also applies to methods lower, such as glfwDestroyCursor
+    private static native long trueNglfwCreateCursor(long image, int xHot, int yHot);
+    private static long nglfwCreateCursor(long image, int xHot, int yHot) {
+        if (CHECKS) {
+            GLFWImage.validate(image);
+        }
+        return trueNglfwCreateCursor(image, xHot, yHot);
+    }
     public static long glfwCreateCursor(@NativeType("const GLFWimage *") GLFWImage image, int xhot, int yhot) {
-        return 4L;
+        return nglfwCreateCursor(image.address(), xhot, yhot);
     }
     public static long glfwCreateStandardCursor(int shape) {
-        return 4L;
+        return 0L;
     }
-    public static void glfwDestroyCursor(@NativeType("GLFWcursor *") long cursor) {}
-    public static void glfwSetCursor(@NativeType("GLFWwindow *") long window, @NativeType("GLFWcursor *") long cursor) {}
+
+    private static native void nglfwDestroyCursor(@NativeType("GLFWcursor *") long cursor);
+    public static void glfwDestroyCursor(@NativeType("GLFWcursor *") long cursor) {
+        if (CHECKS) {
+            check(cursor);
+        }
+        nglfwDestroyCursor(cursor);
+    }
+    private static native void nglfwSetCursor(@NativeType("GLFWwindow *") long window, @NativeType("GLFWcursor *") long cursor);
+    public static void glfwSetCursor(@NativeType("GLFWwindow *") long window, @NativeType("GLFWcursor *") long cursor) {
+        if (CHECKS) {
+            check(window);
+        }
+        nglfwSetCursor(window, cursor);
+    }
 
     public static boolean glfwRawMouseMotionSupported() {
         // Should be not supported?

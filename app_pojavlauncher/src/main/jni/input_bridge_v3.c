@@ -54,6 +54,8 @@ jint JNI_OnLoad(JavaVM* vm, __attribute__((unused)) void* reserved) {
         pojav_environ->method_accessAndroidClipboard = (*dvEnv)->GetStaticMethodID(dvEnv, pojav_environ->bridgeClazz, "accessAndroidClipboard", "(ILjava/lang/String;)Ljava/lang/String;");
         pojav_environ->method_onGrabStateChanged = (*dvEnv)->GetStaticMethodID(dvEnv, pojav_environ->bridgeClazz, "onGrabStateChanged", "(Z)V");
         pojav_environ->method_onDirectInputEnable = (*dvEnv)->GetStaticMethodID(dvEnv, pojav_environ->bridgeClazz, "onDirectInputEnable", "()V");
+        pojav_environ->method_onCursorUpdate = (*dvEnv)->GetStaticMethodID(dvEnv, pojav_environ->bridgeClazz, "onCursorUpdate", "()V");
+        pojav_environ->method_onCursorDestroy = (*dvEnv)->GetStaticMethodID(dvEnv, pojav_environ->bridgeClazz, "onCursorDestroy", "(J)V");
         pojav_environ->isUseStackQueueCall = JNI_FALSE;
     } else if (pojav_environ->dalvikJavaVMPtr != vm) {
         LOGI("Saving JVM environ...");
@@ -553,4 +555,90 @@ Java_org_lwjgl_glfw_CallbackBridge_nativeCreateGamepadButtonBuffer(JNIEnv *env, 
 JNIEXPORT jobject JNICALL
 Java_org_lwjgl_glfw_CallbackBridge_nativeCreateGamepadAxisBuffer(JNIEnv *env, jclass clazz) {
     return (*env)->NewDirectByteBuffer(env, &pojav_environ->gamepadState.axes, sizeof(pojav_environ->gamepadState.axes));
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_lwjgl_glfw_GLFW_trueNglfwCreateCursor(JNIEnv *env, jclass clazz,
+                                           jlong imagePtr, jint x_hot, jint y_hot) {
+    int* width = (int*) imagePtr;
+    int* height = width + 1;
+    unsigned char** pixelBytes = (unsigned char**) (width + 2);
+
+    struct Cursor* cursor = (struct Cursor*) malloc(sizeof(struct Cursor));
+    if (cursor == NULL) {
+        return 0;
+    }
+
+    cursor->xHot = x_hot;
+    cursor->yHot = y_hot;
+    cursor->imgWidth = *width;
+    cursor->imgHeight = *height;
+    cursor->pixels = *pixelBytes;
+
+    return (jlong) cursor;
+}
+
+JNIEXPORT void JNICALL
+Java_org_lwjgl_glfw_GLFW_nglfwDestroyCursor(JNIEnv *env, jclass clazz, jlong ptr) {
+    struct Cursor* cursor = (struct Cursor*) ptr;
+    if (cursor != NULL) {
+        free(cursor);
+
+        TRY_ATTACH_ENV(dvm_env, pojav_environ->dalvikJavaVMPtr, "calling onCursorDestroy from nglfwDestroyCursor failed!\n", return;);
+        (*dvm_env)->CallStaticVoidMethod(dvm_env, pojav_environ->bridgeClazz, pojav_environ->method_onCursorDestroy, (jlong) cursor);
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_org_lwjgl_glfw_GLFW_nglfwSetCursor(JNIEnv *env, jclass clazz, jlong window, jlong ptr) {
+    struct Cursor** originalCursor = &pojav_environ->cursor;
+    struct Cursor* newCursor = (struct Cursor*) ptr;
+
+    *originalCursor = newCursor;
+
+    TRY_ATTACH_ENV(dvm_env, pojav_environ->dalvikJavaVMPtr, "calling onCursorUpdate from nglfwSetCursor failed!\n", return;);
+    (*dvm_env)->CallStaticVoidMethod(dvm_env, pojav_environ->bridgeClazz, pojav_environ->method_onCursorUpdate);
+}
+
+JNIEXPORT jobject JNICALL
+Java_org_lwjgl_glfw_CallbackBridge_nativeGetCursor(JNIEnv *env, jclass clazz, jlong pointer) {
+    struct Cursor* cursor = (struct Cursor*) pointer;
+    if(cursor == NULL || cursor->pixels == NULL) return NULL;
+
+    size_t pixelBufferLength = cursor->imgWidth * cursor->imgHeight * 4;
+    void* internalBuffer = calloc(1, sizeof(int) * 4 + pixelBufferLength);
+    if (internalBuffer == NULL) {
+        return NULL;
+    }
+
+    memcpy((char*) internalBuffer, &cursor->xHot, sizeof(int));
+    memcpy((char*) internalBuffer + sizeof(int), &cursor->yHot, sizeof(int));
+    memcpy((char*) internalBuffer + sizeof(int) * 2, &cursor->imgWidth, sizeof(int));
+    memcpy((char*) internalBuffer + sizeof(int) * 3, &cursor->imgHeight, sizeof(int));
+    memcpy((char*) internalBuffer + sizeof(int) * 4, cursor->pixels, pixelBufferLength);
+
+    jobject buffer = (*env)->NewDirectByteBuffer(env, internalBuffer, sizeof(int) * 4 + pixelBufferLength);
+    if((*env)->GetDirectBufferAddress(env, buffer) != internalBuffer) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "Buffer addresses do not match!");
+        return NULL;
+    }
+    if((*env)->GetDirectBufferCapacity(env, buffer) != sizeof(int) * 4 + pixelBufferLength) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "Buffer capacity does not match!");
+        return NULL;
+    }
+    return buffer;
+}
+
+JNIEXPORT void JNICALL
+Java_org_lwjgl_glfw_CallbackBridge_nativeDeallocateDirectByteBuffer(JNIEnv *env, jclass clazz, jobject buffer) {
+    void* bufferPtr = (*env)->GetDirectBufferAddress(env, buffer);
+    if (bufferPtr != NULL) {
+        free(bufferPtr);
+    }
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_lwjgl_glfw_CallbackBridge_nativeGetCursorPointer(JNIEnv *env, jclass clazz) {
+    if(pojav_environ->cursor == NULL) return 0;
+    return (jlong) pojav_environ->cursor;
 }
