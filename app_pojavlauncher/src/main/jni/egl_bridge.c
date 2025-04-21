@@ -38,19 +38,7 @@
 // This means that you are forced to have this function/variable for ABI compatibility
 #define ABI_COMPAT __attribute__((unused))
 
-
-struct PotatoBridge {
-
-    /* EGLContext */ void* eglContext;
-    /* EGLDisplay */ void* eglDisplay;
-    /* EGLSurface */ void* eglSurface;
-/*
-    void* eglSurfaceRead;
-    void* eglSurfaceDraw;
-*/
-};
 EGLConfig config;
-struct PotatoBridge potatoBridge;
 
 #include "ctxbridges/egl_loader.h"
 #include "ctxbridges/osmesa_loader.h"
@@ -64,15 +52,11 @@ EXTERNAL_API void pojavTerminate() {
 
     switch (pojav_environ->config_renderer) {
         case RENDERER_GL4ES: {
-            eglMakeCurrent_p(potatoBridge.eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-            eglDestroySurface_p(potatoBridge.eglDisplay, potatoBridge.eglSurface);
-            eglDestroyContext_p(potatoBridge.eglDisplay, potatoBridge.eglContext);
-            eglTerminate_p(potatoBridge.eglDisplay);
+            eglMakeCurrent_p(EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+            eglDestroySurface_p(EGL_NO_DISPLAY, EGL_NO_SURFACE);
+            eglDestroyContext_p(EGL_NO_DISPLAY, EGL_NO_CONTEXT);
+            eglTerminate_p(EGL_NO_DISPLAY);
             eglReleaseThread_p();
-
-            potatoBridge.eglContext = EGL_NO_CONTEXT;
-            potatoBridge.eglDisplay = EGL_NO_DISPLAY;
-            potatoBridge.eglSurface = EGL_NO_SURFACE;
         } break;
 
             //case RENDERER_VIRGL:
