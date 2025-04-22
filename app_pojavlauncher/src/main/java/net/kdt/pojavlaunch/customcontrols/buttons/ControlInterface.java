@@ -123,6 +123,7 @@ public interface ControlInterface extends View.OnLongClickListener, GrabListener
             Bitmap bgBitmap = storage.getBitmap(getProperties().bitmapTag);
             if(drawable instanceof BitmapDrawable && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 ((BitmapDrawable)drawable).setBitmap(bgBitmap);
+                ((BitmapDrawable)drawable).setAntiAlias(false);
             }else {
                 drawable = new BitmapDrawable(getControlView().getResources(), bgBitmap);
             }
