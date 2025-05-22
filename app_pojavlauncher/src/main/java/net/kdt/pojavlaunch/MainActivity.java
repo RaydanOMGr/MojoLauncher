@@ -70,6 +70,7 @@ import org.lwjgl.glfw.CallbackBridge;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import git.artdeell.mojo.R;
 
@@ -101,6 +102,8 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
 
     private QuickSettingSideDialog mQuickSettingSideDialog;
 
+    private final Object gl4esDialogLock = new Object();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,6 +114,7 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             finish();
             return;
         }
+
         AsyncAssetManager.extractDefaultSettings(this, instance.getGameDirectory());
         MCOptionUtils.load(instance.getGameDirectory().getAbsolutePath());
 
@@ -359,6 +363,26 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
             Log.w("runCraft","Incompatible renderer "+Tools.LOCAL_RENDERER+ " will be replaced with "+firstCompatibleRenderer);
             Tools.LOCAL_RENDERER = firstCompatibleRenderer;
         }
+        if(Tools.hasSodium(instance.getGameDirectory()) && !Tools.LOCAL_RENDERER.equals("opengles2")) {
+            Tools.runOnUiThread(() -> showSodiumDialog(R.string.sodium_detected_warning));
+        } else if(Tools.LOCAL_RENDERER.equals("opengles2")) {
+            AtomicInteger result = new AtomicInteger(-1);
+            Tools.runOnUiThread(() -> showSodiumGl4esDialog(R.string.sodium_detected_gl4es, result));
+            while (result.get() == -1) {
+                try {
+                    synchronized (gl4esDialogLock) {
+                        gl4esDialogLock.wait();
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+            if(result.get() == 1) {
+                finish();
+                return;
+            }
+        }
         Logger.appendToLog("--------- Starting game with Launcher Debug!");
         Tools.printLauncherInfo(versionId, instance.getLaunchArgs());
         JREUtils.redirectAndPrintJRELog();
@@ -373,6 +397,36 @@ public class MainActivity extends BaseActivity implements ControlButtonMenuListe
         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setTitle(R.string.control_customkey);
         dialog.setItems(EfficientAndroidLWJGLKeycode.generateKeyName(), (dInterface, position) -> EfficientAndroidLWJGLKeycode.execKeyIndex(position));
+        dialog.show();
+    }
+
+    private void showSodiumDialog(int resId) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.sodium_detected_title)
+                .setMessage(resId)
+                .setPositiveButton(android.R.string.ok, (p1, p2) -> {})
+                .setNeutralButton(R.string.mcl_button_discord, (p1, p2) -> Tools.openURL(this, getString(R.string.discord_invite)));
+        dialog.show();
+    }
+
+    private void showSodiumGl4esDialog(int resId, AtomicInteger result) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.sodium_detected_title)
+                .setMessage(resId)
+                .setPositiveButton(R.string.exit, (dialogInterface, which) -> {
+                    result.set(1);
+                    synchronized (gl4esDialogLock) {
+                        gl4esDialogLock.notify();
+                    }
+                })
+                .setNeutralButton(R.string.ignore, (dialogInterface, which) -> {
+                    result.set(0);
+                    synchronized (gl4esDialogLock) {
+                        gl4esDialogLock.notify();
+                    }
+                })
+                .setCancelable(false)
+                .create();
         dialog.show();
     }
 

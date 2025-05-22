@@ -443,4 +443,9 @@
     <string name="auth_select_elyby">Ely.by account</string>
     <string name="auth_select_local">Local account</string>
     <string name="instance_dir_missing">Instance is missing</string>
+    <string name="sodium_detected_title">Sodium has been detected!</string>
+    <string name="sodium_detected_warning">Sodium has been detected in your modlist. Please do not contact Sodium devs regarding any bugs or crashes. Instead, contact us in our discord.</string>
+    <string name="sodium_detected_gl4es">Sodium has been detected in your modlist, but you are using Holy GL4ES. Please choose a different renderer, as Sodium will crash otherwise.</string>
+    <string name="exit">Exit</string>
+    <string name="ignore">Ignore</string>
 </resources>
