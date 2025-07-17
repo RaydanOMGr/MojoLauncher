@@ -72,7 +72,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "git.artdeell.mojo"
+        applicationId "me.andreasmelone.mojo"
         minSdkVersion 21
         targetSdkVersion 35
         versionCode getDateSeconds()
@@ -101,8 +101,8 @@ android {
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.customDebug
-            resValue 'string', 'application_package', 'git.artdeell.mojo.debug'
-            resValue 'string', 'storageProviderAuthorities', 'git.artdeell.mojo.scoped.gamefolder.debug'
+            resValue 'string', 'application_package', 'me.andreasmelone.mojo.debug'
+            resValue 'string', 'storageProviderAuthorities', 'me.andreasmelone.mojo.scoped.gamefolder.debug'
         }
         proguard {
             initWith debug
@@ -121,8 +121,8 @@ android {
             // defaultConfig already set
             // multiDexEnabled = true
             // debuggable = true
-            resValue 'string', 'storageProviderAuthorities', 'git.artdeell.mojo.scoped.gamefolder'
-            resValue 'string', 'application_package', 'git.artdeell.mojo'
+            resValue 'string', 'storageProviderAuthorities', 'me.andreasmelone.mojo.scoped.gamefolder'
+            resValue 'string', 'application_package', 'me.andreasmelone.mojo'
         }
         gplay {
             initWith release
