@@ -29,6 +29,7 @@ public class DropGesture implements Runnable{
 
     @Override
     public void run() {
+        if(LauncherPreferences.PREF_DISABLE_HOTBAR_DROP) return;
         if(!mActive) return;
         sendKeyPress(LwjglGlfwKeycode.GLFW_KEY_Q);
         mHandler.postDelayed(this, 250);

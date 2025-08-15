@@ -1,10 +1,8 @@
 package net.kdt.pojavlaunch.customcontrols.mouse;
 
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 
 import net.kdt.pojavlaunch.LwjglGlfwKeycode;
-import net.kdt.pojavlaunch.SingleTapConfirm;
 import net.kdt.pojavlaunch.Tools;
 import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 
@@ -36,7 +34,7 @@ public class InGUIEventProcessor implements TouchEventProcessor {
                     sendTouchCoordinates(motionEvent.getX(), motionEvent.getY());
 
                     // disabled gestures means no scrolling possible, send gesture early
-                    if (LauncherPreferences.PREF_DISABLE_GESTURES) enableMouse();
+                    if (LauncherPreferences.PREF_DISABLE_BLOCK_BREAK) enableMouse();
                     else setGestureStart(motionEvent);
                 }
                 break;
@@ -44,7 +42,7 @@ public class InGUIEventProcessor implements TouchEventProcessor {
             case MotionEvent.ACTION_MOVE:
                 int pointerCount = motionEvent.getPointerCount();
                 int pointerIndex = mTracker.trackEvent(motionEvent);
-                if(pointerCount == 1 || LauncherPreferences.PREF_DISABLE_GESTURES) {
+                if(pointerCount == 1 || LauncherPreferences.PREF_DISABLE_BLOCK_BREAK) {
                     if(touchpadDisplayed()) {
                         mTouchpad.applyMotionVector(mTracker.getMotionVector());
                     } else {
@@ -68,7 +66,7 @@ public class InGUIEventProcessor implements TouchEventProcessor {
                 mTracker.cancelTracking();
 
                 // Handle single tap on gestures
-                if((!LauncherPreferences.PREF_DISABLE_GESTURES || touchpadDisplayed()) && !mIsMouseDown && singleTap) {
+                if((!LauncherPreferences.PREF_DISABLE_BLOCK_BREAK || touchpadDisplayed()) && !mIsMouseDown && singleTap) {
                     CallbackBridge.putMouseEventWithCoords(LwjglGlfwKeycode.GLFW_MOUSE_BUTTON_LEFT, CallbackBridge.mouseX, CallbackBridge.mouseY);
                 }
 

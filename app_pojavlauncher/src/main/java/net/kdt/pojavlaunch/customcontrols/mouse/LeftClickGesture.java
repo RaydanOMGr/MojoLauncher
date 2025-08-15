@@ -21,6 +21,7 @@ public class LeftClickGesture extends ValidatorGesture {
     }
 
     public final void inputEvent() {
+        if(LauncherPreferences.PREF_DISABLE_BLOCK_BREAK) return;
         if(submit()) {
             mGestureStartX = mGestureEndX = CallbackBridge.mouseX;
             mGestureStartY = mGestureEndY = CallbackBridge.mouseY;

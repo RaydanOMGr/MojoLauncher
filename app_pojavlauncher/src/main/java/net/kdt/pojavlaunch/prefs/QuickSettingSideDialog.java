@@ -1,6 +1,8 @@
 package net.kdt.pojavlaunch.prefs;
 
-import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_DISABLE_GESTURES;
+import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_DISABLE_BLOCK_BREAK;
+import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_DISABLE_BLOCK_PLACE;
+import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_DISABLE_HOTBAR_DROP;
 import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_ENABLE_GYRO;
 import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_GYRO_INVERT_X;
 import static net.kdt.pojavlaunch.prefs.LauncherPreferences.PREF_GYRO_INVERT_Y;
@@ -31,11 +33,11 @@ public abstract class QuickSettingSideDialog extends com.kdt.SideDialogView {
 
     private SharedPreferences.Editor mEditor;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
-    private Switch mGyroSwitch, mGyroXSwitch, mGyroYSwitch, mGestureSwitch;
+    private Switch mGyroSwitch, mGyroXSwitch, mGyroYSwitch, mBlockBreakSwitch, mBlockPlaceSwitch, mHotbarDropSwitch;
     private CustomSeekbar mGyroSensitivityBar, mMouseSpeedBar, mGestureDelayBar, mResolutionBar;
     private TextView mGyroSensitivityText, mGyroSensitivityDisplayText, mMouseSpeedText, mGestureDelayText, mGestureDelayDisplayText, mResolutionText;
 
-    private boolean mOriginalGyroEnabled, mOriginalGyroXEnabled, mOriginalGyroYEnabled, mOriginalGestureDisabled;
+    private boolean mOriginalGyroEnabled, mOriginalGyroXEnabled, mOriginalGyroYEnabled, mOriginalBlockBreakDisabled, mOriginalBlockPlaceDisabled, mOriginalHotbarDropDisabled;
     private float mOriginalGyroSensitivity, mOriginalMouseSpeed, mOriginalResolution;
     private int mOriginalGestureDelay;
 
@@ -64,7 +66,9 @@ public abstract class QuickSettingSideDialog extends com.kdt.SideDialogView {
         mGyroSwitch = mDialogContent.findViewById(R.id.checkboxGyro);
         mGyroXSwitch = mDialogContent.findViewById(R.id.checkboxGyroX);
         mGyroYSwitch = mDialogContent.findViewById(R.id.checkboxGyroY);
-        mGestureSwitch = mDialogContent.findViewById(R.id.checkboxGesture);
+        mBlockBreakSwitch = mDialogContent.findViewById(R.id.checkboxBlockBreak);
+        mBlockPlaceSwitch = mDialogContent.findViewById(R.id.checkboxBlockPlace);
+        mHotbarDropSwitch = mDialogContent.findViewById(R.id.checkboxHotbarDrop);
 
         mGyroSensitivityBar = mDialogContent.findViewById(R.id.editGyro_seekbar);
         mMouseSpeedBar = mDialogContent.findViewById(R.id.editMouseSpeed_seekbar);
@@ -85,7 +89,9 @@ public abstract class QuickSettingSideDialog extends com.kdt.SideDialogView {
         mOriginalGyroEnabled = PREF_ENABLE_GYRO;
         mOriginalGyroXEnabled = PREF_GYRO_INVERT_X;
         mOriginalGyroYEnabled = PREF_GYRO_INVERT_Y;
-        mOriginalGestureDisabled = PREF_DISABLE_GESTURES;
+        mOriginalBlockBreakDisabled = PREF_DISABLE_BLOCK_BREAK;
+        mOriginalBlockPlaceDisabled = PREF_DISABLE_BLOCK_PLACE;
+        mOriginalHotbarDropDisabled = PREF_DISABLE_HOTBAR_DROP;
 
         mOriginalGyroSensitivity = PREF_GYRO_SENSITIVITY;
         mOriginalMouseSpeed = PREF_MOUSESPEED;
@@ -95,7 +101,9 @@ public abstract class QuickSettingSideDialog extends com.kdt.SideDialogView {
         mGyroSwitch.setChecked(mOriginalGyroEnabled);
         mGyroXSwitch.setChecked(mOriginalGyroXEnabled);
         mGyroYSwitch.setChecked(mOriginalGyroYEnabled);
-        mGestureSwitch.setChecked(mOriginalGestureDisabled);
+        mBlockBreakSwitch.setChecked(mOriginalBlockBreakDisabled);
+        mBlockPlaceSwitch.setChecked(mOriginalBlockPlaceDisabled);
+        mHotbarDropSwitch.setChecked(mOriginalHotbarDropDisabled);
 
         mGyroSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             PREF_ENABLE_GYRO = isChecked;
@@ -116,10 +124,21 @@ public abstract class QuickSettingSideDialog extends com.kdt.SideDialogView {
             mEditor.putBoolean("gyroInvertY", isChecked);
         });
 
-        mGestureSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            PREF_DISABLE_GESTURES = isChecked;
-            updateGestureVisibility(isChecked);
-            mEditor.putBoolean("disableGestures", isChecked);
+        mBlockBreakSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            PREF_DISABLE_BLOCK_BREAK = isChecked;
+            updateGestureVisibility(isChecked && PREF_DISABLE_HOTBAR_DROP);
+            mEditor.putBoolean("disableBlockBreak", isChecked);
+        });
+
+        mBlockPlaceSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            PREF_DISABLE_BLOCK_PLACE = isChecked;
+            mEditor.putBoolean("disableBlockPlace", isChecked);
+        });
+
+        mHotbarDropSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            PREF_DISABLE_HOTBAR_DROP = isChecked;
+            updateGestureVisibility(isChecked && PREF_DISABLE_BLOCK_BREAK);
+            mEditor.putBoolean("disableHotbarDrop", isChecked);
         });
 
         mGyroSensitivityBar.setOnSeekBarChangeListener((SimpleSeekBarListener) (seekBar, progress, fromUser) -> {
@@ -157,7 +176,7 @@ public abstract class QuickSettingSideDialog extends com.kdt.SideDialogView {
 
 
         updateGyroVisibility(mOriginalGyroEnabled);
-        updateGestureVisibility(mOriginalGestureDisabled);
+        updateGestureVisibility(mOriginalBlockBreakDisabled && mOriginalHotbarDropDisabled);
     }
 
     private static void setSeekTextMillisecond(TextView target, int value) {
@@ -201,7 +220,7 @@ public abstract class QuickSettingSideDialog extends com.kdt.SideDialogView {
         mGyroSwitch.setOnCheckedChangeListener(null);
         mGyroXSwitch.setOnCheckedChangeListener(null);
         mGyroYSwitch.setOnCheckedChangeListener(null);
-        mGestureSwitch.setOnCheckedChangeListener(null);
+        mBlockBreakSwitch.setOnCheckedChangeListener(null);
 
         mGyroSensitivityBar.setOnSeekBarChangeListener(null);
         mMouseSpeedBar.setOnSeekBarChangeListener(null);
@@ -224,7 +243,8 @@ public abstract class QuickSettingSideDialog extends com.kdt.SideDialogView {
             PREF_ENABLE_GYRO = mOriginalGyroEnabled;
             PREF_GYRO_INVERT_X = mOriginalGyroXEnabled;
             PREF_GYRO_INVERT_Y = mOriginalGyroYEnabled;
-            PREF_DISABLE_GESTURES = mOriginalGestureDisabled;
+            PREF_DISABLE_BLOCK_BREAK = mOriginalBlockBreakDisabled;
+            PREF_DISABLE_BLOCK_PLACE = mOriginalBlockPlaceDisabled;
 
             PREF_GYRO_SENSITIVITY = mOriginalGyroSensitivity;
             PREF_MOUSESPEED = mOriginalMouseSpeed;

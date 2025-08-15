@@ -19,15 +19,27 @@
         <androidx.preference.SwitchPreferenceCompat
             android:defaultValue="false"
             android:icon="@drawable/ic_px_nogestures"
-            android:key="disableGestures"
+            android:key="disableBlockBreak"
             android:summary="@string/mcl_disable_gestures_subtitle"
             android:title="@string/mcl_disable_gestures" />
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="disableBlockPlace"
+            android:summary="@string/mcl_disable_gesture_right_subtitle"
+            android:title="@string/mcl_disable_gesture_right" />
 
         <androidx.preference.SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="disableDoubleTap"
             android:summary="@string/mcl_disable_swap_hand_subtitle"
             android:title="@string/mcl_disable_swap_hand" />
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="disableHotbarDrop"
+            android:summary="@string/mcl_disable_hotbar_drop_subtitle"
+            android:title="@string/mcl_disable_hotbar_drop" />
 
         <net.kdt.pojavlaunch.prefs.CustomSeekBarPreference
             android:key="timeLongPressTrigger"

@@ -155,13 +155,33 @@
 
     <!-- Gesture toggle -->
     <Switch
-        android:id="@+id/checkboxGesture"
+        android:id="@+id/checkboxBlockBreak"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_36sdp"
         android:text="@string/mcl_disable_gestures"
 
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/editMouseSpeed_seekbar"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    <Switch
+        android:id="@+id/checkboxBlockPlace"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_36sdp"
+        android:text="@string/mcl_disable_gesture_right"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/checkboxBlockBreak"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    <Switch
+        android:id="@+id/checkboxHotbarDrop"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_36sdp"
+        android:text="@string/mcl_disable_hotbar_drop"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/checkboxBlockPlace"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     <!-- gesture settings -->
@@ -175,7 +195,7 @@
         android:text="@string/mcl_setting_title_longpresstrigger"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/checkboxGesture" />
+        app:layout_constraintTop_toBottomOf="@id/checkboxHotbarDrop" />
 
     <com.kdt.CustomSeekbar
         android:id="@+id/editGestureDelay_seekbar"

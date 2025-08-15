@@ -81,7 +81,7 @@ public class LauncherPreferenceControlFragment extends LauncherPreferenceFragmen
     }
 
     private void computeVisibility(){
-        requirePreference("timeLongPressTrigger").setVisible(!LauncherPreferences.PREF_DISABLE_GESTURES);
+        requirePreference("timeLongPressTrigger").setVisible(!LauncherPreferences.PREF_DISABLE_BLOCK_BREAK || !LauncherPreferences.PREF_DISABLE_HOTBAR_DROP);
         requirePreference("gyroSensitivity").setVisible(LauncherPreferences.PREF_ENABLE_GYRO);
         requirePreference("gyroSampleRate").setVisible(LauncherPreferences.PREF_ENABLE_GYRO);
         requirePreference("gyroInvertX").setVisible(LauncherPreferences.PREF_ENABLE_GYRO);

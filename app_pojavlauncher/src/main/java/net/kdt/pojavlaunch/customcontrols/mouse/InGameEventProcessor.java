@@ -2,10 +2,7 @@ package net.kdt.pojavlaunch.customcontrols.mouse;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.MotionEvent;
-
-import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 
 import org.lwjgl.glfw.CallbackBridge;
 
@@ -26,7 +23,6 @@ public class InGameEventProcessor implements TouchEventProcessor {
         switch (motionEvent.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 mTracker.startTracking(motionEvent);
-                if(LauncherPreferences.PREF_DISABLE_GESTURES) break;
                 mEventTransitioned = false;
                 checkGestures();
                 break;
@@ -40,7 +36,6 @@ public class InGameEventProcessor implements TouchEventProcessor {
                 CallbackBridge.mouseX += deltaX;
                 CallbackBridge.mouseY += deltaY;
                 CallbackBridge.sendCursorPos(CallbackBridge.mouseX, CallbackBridge.mouseY);
-                if(LauncherPreferences.PREF_DISABLE_GESTURES) break;
                 checkGestures();
                 break;
             case MotionEvent.ACTION_UP:

@@ -3,6 +3,7 @@ package net.kdt.pojavlaunch.customcontrols.mouse;
 import android.os.Handler;
 
 import net.kdt.pojavlaunch.LwjglGlfwKeycode;
+import net.kdt.pojavlaunch.prefs.LauncherPreferences;
 
 import org.lwjgl.glfw.CallbackBridge;
 
@@ -15,6 +16,7 @@ public class RightClickGesture extends ValidatorGesture {
     }
 
     public final void inputEvent() {
+        if(LauncherPreferences.PREF_DISABLE_BLOCK_PLACE) return;
         if(!mGestureEnabled) return;
         if(submit()) {
             mGestureStartX = mGestureEndX = CallbackBridge.mouseX;
