@@ -41,6 +41,7 @@ public class LauncherPreferences {
     public static boolean PREF_DISABLE_BLOCK_PLACE = false;
     public static boolean PREF_DISABLE_SWAP_HAND = false;
     public static boolean PREF_DISABLE_HOTBAR_DROP = false;
+    public static boolean PREF_DISABLE_SCROLL = false;
     public static float PREF_MOUSESPEED = 1f;
     public static int PREF_RAM_ALLOCATION;
     public static String PREF_DEFAULT_RUNTIME;
@@ -90,6 +91,7 @@ public class LauncherPreferences {
         PREF_DISABLE_BLOCK_PLACE = DEFAULT_PREF.getBoolean("disableBlockPlace",false);
         PREF_DISABLE_SWAP_HAND = DEFAULT_PREF.getBoolean("disableDoubleTap", false);
         PREF_DISABLE_HOTBAR_DROP = DEFAULT_PREF.getBoolean("disableHotbarDrop", false);
+        PREF_DISABLE_SCROLL = DEFAULT_PREF.getBoolean("disableScroll", false);
         PREF_RAM_ALLOCATION = DEFAULT_PREF.getInt("allocation", findBestRAMAllocation(ctx));
         PREF_CUSTOM_JAVA_ARGS = DEFAULT_PREF.getString("javaArgs", "");
         PREF_SUSTAINED_PERFORMANCE = DEFAULT_PREF.getBoolean("sustainedPerformance", isDevicePowerful);

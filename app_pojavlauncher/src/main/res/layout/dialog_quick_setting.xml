@@ -175,13 +175,33 @@
         tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     <Switch
+        android:id="@+id/checkboxSwapHand"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_36sdp"
+        android:text="@string/mcl_disable_swap_hand"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/checkboxBlockPlace"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    <Switch
         android:id="@+id/checkboxHotbarDrop"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_36sdp"
         android:text="@string/mcl_disable_hotbar_drop"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/checkboxBlockPlace"
+        app:layout_constraintTop_toBottomOf="@id/checkboxSwapHand"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    <Switch
+        android:id="@+id/checkboxScroll"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_36sdp"
+        android:text="@string/mcl_disable_scroll"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/checkboxHotbarDrop"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     <!-- gesture settings -->
@@ -195,7 +215,7 @@
         android:text="@string/mcl_setting_title_longpresstrigger"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/checkboxHotbarDrop" />
+        app:layout_constraintTop_toBottomOf="@id/checkboxScroll" />
 
     <com.kdt.CustomSeekbar
         android:id="@+id/editGestureDelay_seekbar"

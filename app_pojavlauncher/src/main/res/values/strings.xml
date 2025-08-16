@@ -172,6 +172,8 @@
     <string name="mcl_disable_swap_hand_subtitle">Disables double tapping on the hotbar item to swap it in the second hand.</string>
     <string name="mcl_disable_hotbar_drop">Disable hotbar item dropping</string>
     <string name="mcl_disable_hotbar_drop_subtitle">Disables holding the hotbar item to drop it.</string>
+    <string name="mcl_disable_scroll">Disable scroll gesture</string>
+    <string name="mcl_disable_scroll_subtitle">Disables scrolling with two fingers to scroll.</string>
     <string name="mcl_setting_title_mousespeed">Mouse Speed</string>
     <string name="mcl_setting_subtitle_mousespeed">Changes the speed of the virtual mouse.</string>
     <string name="customctrl_passthru">Mouse pass-thru</string>
