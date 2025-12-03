@@ -6,7 +6,7 @@
         <item name="windowActionBar">false</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:statusBarColor">?attr/colorBackgroundStatusBar</item>
-        <item name="android:navigationBarColor">?attr/colorBackgroundApp</item>
+        <item name="android:navigationBarColor">?attr/colorBackgroundBottomBar</item>
 
         <item name="android:textSize">@dimen/_12ssp</item>
 
@@ -190,13 +190,13 @@
         <item name="colorControlButton">#4CC4C4C4</item>
         <item name="colorControlButtonPressed">#4D000000</item>
 
-        <item name="colorMineButton">#69b373</item>
+        <item name="colorMineButton">#a367cb</item>
         <item name="colorMineButtonAdd">#00000000</item>
         <item name="colorBackgroundApp">#dee1e6</item>
         <item name="colorDivider">#1f2328</item>
         <item name="colorBackgroundOverlay">#1f2328</item>
-        <item name="colorBackgroundStatusBar">#B1B4BD</item>
-        <item name="colorBackgroundBottomBar">#B1B4BD</item>
+        <item name="colorBackgroundStatusBar">#CBD2DC</item>
+        <item name="colorBackgroundBottomBar">#CBD2DC</item>
         <item name="colorIconOutline">#6b7078</item>
 
         <item name="colorPrimaryText">#101419</item>
@@ -207,6 +207,8 @@
         <item name="android:textColorSecondary">?attr/colorSecondaryText</item>
 
         <item name="colorIcon">#101419</item>
+        <item name="android:colorAccent">#a367cb</item>
+        <item name="colorControlActivated">#a367cb</item>
     </style>
     <style name="LightDecayTheme" parent="BaseLightDecayTheme" /> <!-- https://github.com/decaycs/decaycs -->
 
