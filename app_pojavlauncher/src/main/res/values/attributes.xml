@@ -24,8 +24,10 @@
     <attr name="colorMineButtonAdd" format="color"/> <!-- the color that is going to be added to the mine button -->
     <attr name="fontMineButton" format="reference" /> <!-- should always reference a font, otherwise a crash is almost guaranteed -->
     <attr name="fontSizeMineButton" format="dimension" />
+    <attr name="colorMineButtonText" format="color" />
 
     <attr name="colorIcon" format="color" />
+    <attr name="colorControlEditorBackground" format="color" />
 
     <attr name="drawableNoFocusShown" format="reference" />
     <attr name="drawableSettingSignInBackground" format="reference" />

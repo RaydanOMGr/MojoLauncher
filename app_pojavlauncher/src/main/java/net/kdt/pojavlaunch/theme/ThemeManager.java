@@ -55,7 +55,7 @@ public class ThemeManager {
         ThemeInfo midnightTheme = new ThemeInfo("Midnight", R.style.MidnightTheme, ctx -> ctx);
         ThemeInfo amethystTheme = new ThemeInfo("Amethyst", R.style.AmethystTheme, ctx -> ctx);
         ThemeInfo darkDecayTheme = new ThemeInfo("Dark Decay", R.style.DarkDecayTheme, ctx -> ctx);
-        ThemeInfo lightDecayTheme = new ThemeInfo("Light Decay", R.style.LightDecayTheme, ctx -> ctx);
+        ThemeInfo lightDecayTheme = new ThemeInfo("Light", R.style.LightTheme, ctx -> ctx);
 
         this.themeMap.put(defaultTheme.getThemeName(), defaultTheme);
         this.themeMap.put(pojavTheme.getThemeName(), pojavTheme);

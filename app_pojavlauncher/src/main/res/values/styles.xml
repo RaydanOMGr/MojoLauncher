@@ -27,8 +27,10 @@
         <item name="colorMineButtonAdd">#00000000</item>
         <item name="fontMineButton">@font/noto_sans_bold</item>
         <item name="fontSizeMineButton">@dimen/_13ssp</item>
+        <item name="colorMineButtonText">?attr/colorPrimaryText</item>
 
         <item name="colorIcon">@android:color/white</item>
+        <item name="colorControlEditorBackground">?attr/colorBackgroundApp</item>
 
         <item name="drawableNoFocusShown">@drawable/no_focus_shown</item>
         <item name="drawableSettingSignInBackground">@drawable/ic_setting_sign_in_background</item>
@@ -181,14 +183,17 @@
 
         <item name="colorPrimaryText">#FFFFFF</item>
         <item name="colorSecondaryText">#B2B2B2</item>
+
+        <item name="fontMineButton">@font/minecraft_ten</item>
+        <item name="fontSizeMineButton">@dimen/_17ssp</item>
     </style>
     <style name="DarkDecayTheme" parent="BaseDarkDecayTheme" /> <!-- https://github.com/decaycs/decaycs -->
 
-    <style name="BaseLightDecayTheme" parent="BaseAppTheme">
+    <style name="BaseLightTheme" parent="BaseAppTheme">
         <item name="android:textSize">@dimen/_12ssp</item>
 
-        <item name="colorControlButton">#4CC4C4C4</item>
-        <item name="colorControlButtonPressed">#4D000000</item>
+        <item name="colorControlButton">#FFFFFFFF</item>
+        <item name="colorControlButtonPressed">#FFAAAAAA</item>
 
         <item name="colorMineButton">#a367cb</item>
         <item name="colorMineButtonAdd">#00000000</item>
@@ -209,8 +214,15 @@
         <item name="colorIcon">#101419</item>
         <item name="android:colorAccent">#a367cb</item>
         <item name="colorControlActivated">#a367cb</item>
+        
+        <item name="colorBackgroundFloating">?attr/colorBackgroundApp</item>
+        <item name="textColorAlertDialogListItem">?attr/colorPrimaryText</item>
+
+        <item name="colorMineButtonText">#FFFFFF</item>
+        <item name="fontMineButton">@font/minecraft_ten</item>
+        <item name="fontSizeMineButton">@dimen/_17ssp</item>
     </style>
-    <style name="LightDecayTheme" parent="BaseLightDecayTheme" /> <!-- https://github.com/decaycs/decaycs -->
+    <style name="LightTheme" parent="BaseLightTheme" /> <!-- used to be decays, but I applied too many changes for it to still be the same thing -->
 
     <style name="LauncherFragment_Divider">
         <item name="android:layout_width">@dimen/padding_tiny</item>
