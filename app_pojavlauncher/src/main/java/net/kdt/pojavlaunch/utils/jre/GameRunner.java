@@ -174,17 +174,6 @@ public class GameRunner {
             instance.write();
         }
 
-        boolean isGl4es = rendererName.equals("opengles2");
-        boolean ltwSupported = RendererCompatUtil.getCompatibleRenderers(activity).rendererIds.contains("opengles3_ltw");
-        // Block Sodium from running with GL4ES on 1.17+
-        if(!isCompatContext(versionInfo) && isGl4es && hasSodium(gamedir)) {
-            rendererName = switchLtw(ltwSupported, instance, activity, R.string.compat_sodium_not_supported);
-        }
-
-        // Switch renderer to LTW when running 1.21.5
-        if(!isGl4esCompatible(versionInfo) && isGl4es) {
-            rendererName = switchLtw(ltwSupported, instance, activity, R.string.compat_version_not_supported);
-        }
         RendererCompatUtil.releaseRenderersCache();
 
         boolean isLtw = rendererName.equals("opengles3_ltw");
